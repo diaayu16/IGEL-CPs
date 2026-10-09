@@ -1,0 +1,407 @@
+
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Mining Inventory Management</title>
+<style>
+:root {
+  --navy: #14283f;
+  --blue: #245c86;
+  --bg: #f2f5f8;
+  --border: #dce3eb;
+}
+* { box-sizing: border-box; }
+body {
+  margin: 0;
+  font-family: Arial, sans-serif;
+  background: var(--bg);
+  color: #263548;
+}
+header {
+  background: var(--navy);
+  color: white;
+  padding: 22px 5%;
+}
+header h1 { margin: 0 0 7px; font-size: 23px; }
+header p { margin: 0; color: #d0dce8; font-size: 13px; }
+main { max-width: 1200px; margin: auto; padding: 25px 18px; }
+h2 { font-size: 18px; }
+.stats {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 14px;
+}
+.card, .panel {
+  background: white;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 18px;
+}
+.stat-label { color: #65758a; font-size: 13px; }
+.stat-value { font-size: 27px; font-weight: bold; margin-top: 12px; }
+.panel { margin-top: 20px; }
+.form-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 12px;
+}
+label { display: block; font-size: 12px; margin-bottom: 6px; }
+input, select {
+  width: 100%;
+  padding: 10px;
+  border: 1px solid #cbd5e1;
+  border-radius: 6px;
+  background: white;
+}
+button {
+  padding: 10px 14px;
+  border: 0;
+  border-radius: 6px;
+  background: var(--blue);
+  color: white;
+  cursor: pointer;
+}
+button:hover { opacity: .88; }
+.form-actions { margin-top: 14px; display: flex; gap: 8px; }
+.tools { display: flex; gap: 10px; margin: 14px 0; }
+.tools input { max-width: 400px; }
+.table-wrap { overflow-x: auto; }
+table { border-collapse: collapse; width: 100%; min-width: 700px; }
+th, td {
+  text-align: left;
+  padding: 12px 10px;
+  border-bottom: 1px solid var(--border);
+  font-size: 13px;
+}
+th { background: #f7f9fc; }
+.status {
+  display: inline-block;
+  padding: 5px 8px;
+  border-radius: 20px;
+  font-size: 11px;
+  font-weight: bold;
+}
+.ok { background: #dcfce7; color: #166534; }
+.low { background: #fef3c7; color: #92400e; }
+.out { background: #fee2e2; color: #991b1b; }
+.action-btn { padding: 7px 9px; margin: 2px; font-size: 12px; }
+.delete { background: #b42318; }
+footer { text-align: center; color: #718096; font-size: 12px; padding: 24px; }
+@media(max-width: 760px) {
+  .stats { grid-template-columns: repeat(2, 1fr); }
+  .form-grid { grid-template-columns: repeat(2, 1fr); }
+}
+@media(max-width: 430px) {
+  .form-grid { grid-template-columns: 1fr; }
+  .tools { flex-direction: column; }
+}
+</style>
+</head>
+<body>
+<header>
+  <h1>⛏ Mining Inventory Management</h1>
+  <p>Spare Parts & Warehouse Control System</p>
+</header>
+
+<main>
+  <h2>Inventory Overview</h2>
+  <section class="stats">
+    <div class="card">
+      <div class="stat-label">Jenis Barang</div>
+      <div class="stat-value" id="totalTypes">0</div>
+    </div>
+    <div class="card">
+      <div class="stat-label">Total Unit Stok</div>
+      <div class="stat-value" id="totalStock">0</div>
+    </div>
+    <div class="card">
+      <div class="stat-label">Stok Menipis</div>
+      <div class="stat-value" id="lowStock">0</div>
+    </div>
+    <div class="card">
+      <div class="stat-label">Stok Habis</div>
+      <div class="stat-value" id="outStock">0</div>
+    </div>
+  </section>
+
+  <section class="panel">
+    <h2 id="formTitle">Tambah Spare Part</h2>
+    <form id="itemForm">
+      <div class="form-grid">
+        <div>
+          <label for="code">Kode Barang</label>
+          <input id="code" required placeholder="SP-001">
+        </div>
+        <div>
+          <label for="name">Nama Spare Part</label>
+          <input id="name" required placeholder="Oil Filter">
+        </div>
+        <div>
+          <label for="category">Kategori</label>
+          <select id="category">
+            <option>Engine</option>
+            <option>Hydraulic</option>
+            <option>Electrical</option>
+            <option>Tire & Wheel</option>
+            <option>Safety Equipment</option>
+            <option>Other</option>
+          </select>
+        </div>
+        <div>
+          <label for="location">Lokasi Gudang</label>
+          <input id="location" required placeholder="Warehouse A">
+        </div>
+        <div>
+          <label for="qty">Jumlah Stok</label>
+          <input id="qty" type="number" min="0" step="1" required value="0">
+        </div>
+        <div>
+          <label for="minimum">Batas Minimum Stok</label>
+          <input id="minimum" type="number" min="0" step="1" required value="5">
+        </div>
+        <div>
+          <label for="unit">Satuan</label>
+          <select id="unit">
+            <option>pcs</option>
+            <option>unit</option>
+            <option>set</option>
+            <option>liter</option>
+            <option>box</option>
+          </select>
+        </div>
+      </div>
+      <div class="form-actions">
+        <button type="submit" id="saveBtn">Simpan Barang</button>
+        <button type="button" id="cancelBtn" hidden>Batal</button>
+      </div>
+    </form>
+  </section>
+
+  <section class="panel">
+    <h2>Spare Parts Inventory</h2>
+    <div class="tools">
+      <input id="search" placeholder="Cari kode, nama, kategori, lokasi...">
+      <button type="button" id="exportBtn">Export CSV</button>
+    </div>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>Kode</th><th>Nama Barang</th><th>Kategori</th>
+            <th>Lokasi</th><th>Stok</th><th>Status</th><th>Aksi</th>
+          </tr>
+        </thead>
+        <tbody id="inventoryBody"></tbody>
+      </table>
+    </div>
+    <p id="emptyMessage">Belum ada barang. Tambahkan barang melalui formulir di atas.</p>
+  </section>
+</main>
+
+<footer>Mining Inventory Management • Demo Portfolio Project</footer>
+
+<script>
+const STORAGE_KEY = "miningInventoryV1";
+
+let items = [];
+try {
+  items = JSON.parse(localStorage.getItem(STORAGE_KEY) || "[]");
+  if (!Array.isArray(items)) items = [];
+} catch {
+  items = [];
+}
+let editingId = null;
+
+const $ = id => document.getElementById(id);
+const fields = ["code", "name", "category", "location", "qty", "minimum", "unit"];
+
+function persist() {
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(items));
+}
+
+function statusOf(item) {
+  if (item.qty === 0) return ["Stok Habis", "out"];
+  if (item.qty <= item.minimum) return ["Stok Menipis", "low"];
+  return ["Tersedia", "ok"];
+}
+
+function render() {
+  $("totalTypes").textContent = items.length;
+  $("totalStock").textContent = items.reduce((sum, item) => sum + item.qty, 0);
+  $("lowStock").textContent = items.filter(
+    item => item.qty > 0 && item.qty <= item.minimum
+  ).length;
+  $("outStock").textContent = items.filter(item => item.qty === 0).length;
+
+  const term = $("search").value.trim().toLowerCase();
+  const filtered = items.filter(item =>
+    [item.code, item.name, item.category, item.location]
+      .some(value => value.toLowerCase().includes(term))
+  );
+
+  const body = $("inventoryBody");
+  body.replaceChildren();
+  $("emptyMessage").hidden = filtered.length > 0;
+
+  filtered.forEach(item => {
+    const [status, css] = statusOf(item);
+    const tr = document.createElement("tr");
+
+    function cell(value) {
+      const td = document.createElement("td");
+      td.textContent = value;
+      tr.appendChild(td);
+      return td;
+    }
+
+    cell(item.code);
+    cell(item.name);
+    cell(item.category);
+    cell(item.location);
+    cell(`${item.qty} ${item.unit}`);
+
+    const statusCell = cell("");
+    const badge = document.createElement("span");
+    badge.className = `status ${css}`;
+    badge.textContent = status;
+    statusCell.appendChild(badge);
+
+    const actions = cell("");
+    actions.append(
+      makeButton("+ Masuk", () => adjustStock(item.id, 1)),
+      makeButton("- Keluar", () => adjustStock(item.id, -1)),
+      makeButton("Edit", () => editItem(item.id)),
+      makeButton("Hapus", () => deleteItem(item.id), "delete")
+    );
+
+    body.appendChild(tr);
+  });
+}
+
+function makeButton(label, handler, extraClass = "") {
+  const button = document.createElement("button");
+  button.type = "button";
+  button.textContent = label;
+  button.className = `action-btn ${extraClass}`;
+  button.addEventListener("click", handler);
+  return button;
+}
+
+$("itemForm").addEventListener("submit", event => {
+  event.preventDefault();
+
+  const item = {};
+  fields.forEach(field => {
+    item[field] = $(field).value.trim();
+  });
+
+  item.qty = Number(item.qty);
+  item.minimum = Number(item.minimum);
+
+  if (!Number.isInteger(item.qty) || item.qty < 0 ||
+      !Number.isInteger(item.minimum) || item.minimum < 0) {
+    alert("Stok dan batas minimum harus berupa bilangan bulat nonnegatif.");
+    return;
+  }
+
+  item.code = item.code.toUpperCase();
+
+  const duplicate = items.some(existing =>
+    existing.code.toLowerCase() === item.code.toLowerCase() &&
+    existing.id !== editingId
+  );
+  if (duplicate) {
+    alert("Kode barang sudah digunakan. Gunakan kode yang berbeda.");
+    return;
+  }
+
+  if (editingId) {
+    const index = items.findIndex(existing => existing.id === editingId);
+    if (index !== -1) items[index] = { ...items[index], ...item };
+  } else {
+    items.push({ id: crypto.randomUUID(), ...item });
+  }
+
+  persist();
+  resetForm();
+  render();
+});
+
+function resetForm() {
+  editingId = null;
+  $("itemForm").reset();
+  $("qty").value = 0;
+  $("minimum").value = 5;
+  $("formTitle").textContent = "Tambah Spare Part";
+  $("saveBtn").textContent = "Simpan Barang";
+  $("cancelBtn").hidden = true;
+}
+
+function editItem(id) {
+  const item = items.find(item => item.id === id);
+  if (!item) return;
+  editingId = id;
+  fields.forEach(field => $(field).value = item[field]);
+  $("formTitle").textContent = "Edit Spare Part";
+  $("saveBtn").textContent = "Simpan Perubahan";
+  $("cancelBtn").hidden = false;
+  $("itemForm").scrollIntoView({ behavior: "smooth" });
+}
+
+function adjustStock(id, direction) {
+  const item = items.find(item => item.id === id);
+  if (!item) return;
+
+  const action = direction > 0 ? "jumlah barang masuk" : "jumlah barang keluar";
+  const amount = prompt(`Masukkan ${action} untuk ${item.name}:`);
+  if (amount === null) return;
+
+  const quantity = Number(amount);
+  if (!Number.isInteger(quantity) || quantity <= 0) {
+    alert("Masukkan bilangan bulat lebih besar dari nol.");
+    return;
+  }
+  if (direction < 0 && quantity > item.qty) {
+    alert("Stok tidak mencukupi.");
+    return;
+  }
+
+  item.qty += direction * quantity;
+  persist();
+  render();
+}
+
+function deleteItem(id) {
+  const item = items.find(item => item.id === id);
+  if (!item || !confirm(`Hapus barang ${item.name}?`)) return;
+  items = items.filter(item => item.id !== id);
+  persist();
+  render();
+}
+
+$("cancelBtn").addEventListener("click", resetForm);
+$("search").addEventListener("input", render);
+
+$("exportBtn").addEventListener("click", () => {
+  const columns = ["code", "name", "category", "location", "qty", "minimum", "unit"];
+  const quote = value => `"${String(value).replace(/"/g, '""')}"`;
+  const csv = [
+    columns.join(","),
+    ...items.map(item => columns.map(key => quote(item[key])).join(","))
+  ].join("\r\n");
+
+  const blob = new Blob(["\uFEFF" + csv], { type: "text/csv;charset=utf-8;" });
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement("a");
+  link.href = url;
+  link.download = "mining-inventory.csv";
+  link.click();
+  URL.revokeObjectURL(url);
+});
+
+render();
+</script>
+</body>
+</html>
