@@ -1,0 +1,970 @@
+
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#101a2c">
+  <meta name="description" content="Mining Inventory Management - Sistem pengelolaan inventaris dan stok barang tambang.">
+  <title>Mining Inventory Management</title>
+
+  <style>
+    :root {
+      --navy: #101a2c;
+      --navy-light: #1b2940;
+      --orange: #f59e0b;
+      --bg: #f3f5f9;
+      --white: #ffffff;
+      --text: #1e293b;
+      --muted: #758198;
+      --border: #e6eaf0;
+      --green: #15966a;
+      --red: #dc4c4c;
+      --blue: #3778e5;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      font-family: Inter, "Segoe UI", Arial, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+    }
+
+    button, input, select, textarea { font: inherit; }
+    button { cursor: pointer; }
+
+    .layout { display: flex; min-height: 100vh; }
+
+    aside {
+      width: 245px;
+      flex-shrink: 0;
+      background: var(--navy);
+      color: white;
+      padding: 26px 17px;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 0 9px 28px;
+      border-bottom: 1px solid #2c3749;
+    }
+
+    .brand-icon {
+      width: 42px;
+      height: 42px;
+      border-radius: 12px;
+      background: var(--orange);
+      color: #1b2433;
+      display: grid;
+      place-items: center;
+      font-size: 22px;
+      font-weight: 900;
+    }
+
+    .brand h2 { margin: 0; font-size: 14px; line-height: 1.5; }
+    .brand small { color: #aab6c9; font-size: 11px; }
+
+    .nav-label {
+      margin: 27px 10px 12px;
+      font-size: 10px;
+      letter-spacing: 1.5px;
+      color: #8c9bb1;
+      font-weight: 700;
+    }
+
+    .nav-item {
+      width: 100%;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 12px 13px;
+      border: 0;
+      border-radius: 9px;
+      margin-bottom: 5px;
+      background: transparent;
+      color: #c4cede;
+      text-align: left;
+      font-size: 13px;
+    }
+
+    .nav-item:hover, .nav-item.active {
+      background: #28364c;
+      color: white;
+    }
+
+    .nav-item.active { border-left: 3px solid var(--orange); }
+    .nav-icon { width: 19px; text-align: center; font-size: 17px; }
+
+    .sidebar-bottom {
+      margin-top: auto;
+      padding: 20px 9px 0;
+      color: #aab6c9;
+      font-size: 11px;
+      line-height: 1.8;
+    }
+
+    main { flex: 1; min-width: 0; }
+
+    header {
+      background: white;
+      min-height: 76px;
+      padding: 15px 30px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 18px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .header-title { font-size: 18px; font-weight: 750; }
+    .breadcrumb { font-size: 12px; color: var(--muted); margin-top: 5px; }
+
+    .header-right { display: flex; align-items: center; gap: 13px; }
+    .status { color: var(--green); font-size: 12px; font-weight: 650; }
+
+    .avatar {
+      width: 38px; height: 38px;
+      display: grid; place-items: center;
+      border-radius: 50%;
+      background: #fff0cf;
+      color: #9a6200;
+      font-weight: 800;
+    }
+
+    .content { padding: 27px 30px 35px; max-width: 1600px; margin: auto; }
+
+    .welcome {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 15px;
+      margin-bottom: 24px;
+    }
+
+    h1 { font-size: 24px; margin: 0 0 8px; letter-spacing: -0.5px; }
+    .subheading { color: var(--muted); font-size: 13px; line-height: 1.6; }
+
+    .button {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 7px;
+      border: 0;
+      border-radius: 8px;
+      padding: 11px 15px;
+      font-weight: 650;
+      font-size: 12px;
+      white-space: nowrap;
+    }
+
+    .button-primary { background: var(--orange); color: #222b38; }
+    .button-primary:hover { background: #e9a00e; }
+    .button-dark { background: var(--navy); color: white; }
+    .button-outline { border: 1px solid var(--border); background: white; color: var(--text); }
+    .button-danger { background: #fff0f0; color: var(--red); }
+
+    .stats {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 17px;
+      margin-bottom: 24px;
+    }
+
+    .stat-card {
+      background: white;
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 20px;
+      min-width: 0;
+    }
+
+    .stat-top { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+    .stat-name { font-size: 12px; color: var(--muted); }
+    .stat-icon {
+      width: 38px; height: 38px; border-radius: 10px;
+      display: grid; place-items: center; font-size: 19px;
+    }
+
+    .icon-orange { background: #fff2d7; }
+    .icon-blue { background: #e8f0ff; }
+    .icon-green { background: #e0f7ed; }
+    .icon-red { background: #ffebeb; }
+
+    .stat-value { font-size: 27px; font-weight: 800; margin: 15px 0 6px; }
+    .stat-foot { font-size: 11px; color: var(--muted); }
+    .good { color: var(--green); font-weight: 700; }
+    .warning { color: #c17b05; font-weight: 700; }
+    .danger { color: var(--red); font-weight: 700; }
+
+    .panel {
+      background: white;
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      margin-bottom: 22px;
+      overflow: hidden;
+    }
+
+    .panel-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 14px;
+      padding: 20px 22px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .panel-head h3 { margin: 0; font-size: 15px; }
+    .panel-head p { margin: 6px 0 0; color: var(--muted); font-size: 11px; }
+
+    .filters { display: flex; gap: 9px; flex-wrap: wrap; }
+    .control {
+      border: 1px solid #dfe5ee;
+      background: white;
+      padding: 10px 12px;
+      border-radius: 7px;
+      color: var(--text);
+      font-size: 12px;
+      outline: none;
+      min-width: 0;
+    }
+
+    .control:focus { border-color: var(--blue); }
+    .search { width: 205px; }
+
+    .table-wrap { overflow-x: auto; }
+
+    table { width: 100%; border-collapse: collapse; text-align: left; }
+    th {
+      background: #f8f9fc;
+      color: #788398;
+      font-size: 10px;
+      text-transform: uppercase;
+      letter-spacing: .5px;
+      padding: 14px 19px;
+      white-space: nowrap;
+    }
+
+    td {
+      padding: 16px 19px;
+      border-top: 1px solid #edf0f5;
+      font-size: 12px;
+      white-space: nowrap;
+    }
+
+    tbody tr:hover { background: #fafbfe; }
+
+    .item-name { font-weight: 750; color: #25334a; }
+    .item-code { font-size: 10px; color: var(--muted); margin-top: 5px; }
+    .pill {
+      display: inline-block;
+      border-radius: 20px;
+      padding: 6px 9px;
+      font-size: 10px;
+      font-weight: 750;
+    }
+
+    .pill-green { background: #e3f7ed; color: #148459; }
+    .pill-yellow { background: #fff4d8; color: #a86b00; }
+    .pill-red { background: #ffebeb; color: #ca3939; }
+    .pill-blue { background: #e8f0ff; color: #326bd0; }
+    .pill-gray { background: #edf0f5; color: #566276; }
+
+    .row-actions { display: flex; gap: 6px; }
+    .small-btn {
+      padding: 6px 8px; border: 1px solid var(--border);
+      border-radius: 6px; background: white; font-size: 11px;
+    }
+    .small-btn:hover { background: #f0f4fa; }
+
+    .bottom-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px;
+    }
+
+    .movement-row {
+      padding: 15px 21px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      border-bottom: 1px solid #edf0f5;
+    }
+
+    .movement-row:last-child { border-bottom: 0; }
+    .movement-icon {
+      width: 35px; height: 35px; border-radius: 9px;
+      display: grid; place-items: center; font-weight: 800;
+    }
+    .movement-info { flex: 1; min-width: 0; }
+    .movement-info strong { font-size: 12px; }
+    .movement-info small { display: block; color: var(--muted); font-size: 10px; margin-top: 5px; }
+    .movement-qty { font-size: 12px; font-weight: 800; }
+
+    .stock-line { padding: 16px 21px; border-bottom: 1px solid #edf0f5; }
+    .stock-line:last-child { border-bottom: 0; }
+    .stock-info { display: flex; justify-content: space-between; gap: 10px; font-size: 12px; margin-bottom: 10px; }
+    .stock-info small { color: var(--muted); }
+    .progress { height: 6px; background: #edf0f5; border-radius: 9px; overflow: hidden; }
+    .progress-bar { height: 100%; border-radius: 9px; }
+
+    footer { text-align: center; padding: 18px; color: var(--muted); font-size: 10px; }
+
+    .empty { text-align: center; padding: 30px; color: var(--muted); }
+
+    .toast {
+      position: fixed; bottom: 22px; right: 22px;
+      background: var(--navy); color: white;
+      padding: 14px 20px; border-radius: 9px;
+      font-size: 13px; box-shadow: 0 5px 25px #0002;
+      z-index: 20; display: none; max-width: calc(100vw - 40px);
+    }
+
+    dialog {
+      border: 0; border-radius: 14px; padding: 0;
+      width: min(500px, calc(100% - 30px));
+      box-shadow: 0 20px 70px #0003;
+      max-height: 90vh; overflow: auto;
+    }
+
+    dialog::backdrop { background: #0d1729a8; }
+    .modal-head { padding: 20px 23px; border-bottom: 1px solid var(--border); }
+    .modal-head h3 { margin: 0; font-size: 17px; }
+    .modal-body { padding: 22px; }
+    .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
+    .field { display: flex; flex-direction: column; gap: 7px; }
+    .field.full { grid-column: 1 / -1; }
+    .field label { font-size: 11px; font-weight: 700; color: #536077; }
+    .field input, .field select, .field textarea {
+      width: 100%; border: 1px solid #dfe5ee; border-radius: 7px;
+      padding: 11px; outline: none; background: white; color: var(--text);
+    }
+    .field input:focus, .field select:focus { border-color: var(--blue); }
+    .modal-actions { display: flex; justify-content: flex-end; gap: 9px; margin-top: 22px; }
+
+    .page-view { display: none; }
+    .page-view.active { display: block; }
+
+    @media (max-width: 1100px) {
+      aside { width: 205px; }
+      .content { padding: 23px 20px; }
+      header { padding: 15px 20px; }
+      .stats { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      .panel-head { align-items: flex-start; flex-direction: column; }
+      .search { width: min(240px, 100%); }
+    }
+
+    @media (max-width: 700px) {
+      aside { width: 65px; padding: 20px 8px; }
+      .brand { justify-content: center; padding: 0 0 20px; }
+      .brand-text, .nav-label, .nav-text, .sidebar-bottom { display: none; }
+      .brand-icon { width: 40px; height: 40px; flex-shrink: 0; }
+      .nav-item { justify-content: center; padding: 12px 5px; }
+      .nav-icon { font-size: 20px; }
+      header { padding: 14px; }
+      .header-title { font-size: 15px; }
+      .header-right .status { display: none; }
+      .content { padding: 20px 12px; }
+      h1 { font-size: 21px; }
+      .welcome { align-items: flex-start; flex-direction: column; }
+      .stats { gap: 10px; }
+      .stat-card { padding: 14px; }
+      .stat-value { font-size: 23px; }
+      .stat-name { font-size: 11px; }
+      .stat-icon { width: 31px; height: 31px; }
+      .bottom-grid { grid-template-columns: 1fr; gap: 0; }
+      .filters { width: 100%; }
+      .search { flex: 1; width: 100%; }
+      .filters select { flex: 1; }
+      .panel-head { padding: 17px; }
+      td, th { padding: 13px; }
+      .form-grid { grid-template-columns: 1fr; }
+      .field.full { grid-column: auto; }
+    }
+  </style>
+</head>
+
+<body>
+<div class="layout">
+  <aside>
+    <div class="brand">
+      <div class="brand-icon">M</div>
+      <div class="brand-text">
+        <h2>MINING INVENTORY</h2>
+        <small>MANAGEMENT SYSTEM</small>
+      </div>
+    </div>
+
+    <div class="nav-label">MENU UTAMA</div>
+    <button class="nav-item active" data-page="dashboard"><span class="nav-icon">▦</span><span class="nav-text">Dashboard</span></button>
+    <button class="nav-item" data-page="inventory"><span class="nav-icon">▤</span><span class="nav-text">Data Inventaris</span></button>
+    <button class="nav-item" data-page="transactions"><span class="nav-icon">⇄</span><span class="nav-text">Transaksi Stok</span></button>
+
+    <div class="nav-label">LAINNYA</div>
+    <button class="nav-item" data-page="reports"><span class="nav-icon">▥</span><span class="nav-text">Laporan Stok</span></button>
+    <button class="nav-item" id="backupBtn"><span class="nav-icon">⇩</span><span class="nav-text">Ekspor Data CSV</span></button>
+    <button class="nav-item" id="resetBtn"><span class="nav-icon">↻</span><span class="nav-text">Reset Data Demo</span></button>
+
+    <div class="sidebar-bottom">
+      <strong>MINING INVENTORY v1.0</strong><br>
+      Sistem pencatatan inventaris tambang
+    </div>
+  </aside>
+
+  <main>
+    <header>
+      <div>
+        <div class="header-title" id="headerTitle">Dashboard Overview</div>
+        <div class="breadcrumb">Mining Inventory / <span id="breadcrumb">Dashboard</span></div>
+      </div>
+      <div class="header-right">
+        <span class="status">● Sistem aktif</span>
+        <div class="avatar">MI</div>
+      </div>
+    </header>
+
+    <div class="content">
+      <section class="page-view active" id="dashboard">
+        <div class="welcome">
+          <div>
+            <h1>Dashboard Inventaris</h1>
+            <div class="subheading">Pantau ketersediaan barang dan aktivitas stok operasional tambang.</div>
+          </div>
+          <button class="button button-primary" id="addItemTop">＋ Tambah Barang</button>
+        </div>
+
+        <div class="stats">
+          <div class="stat-card">
+            <div class="stat-top"><span class="stat-name">Total Jenis Barang</span><span class="stat-icon icon-orange">▤</span></div>
+            <div class="stat-value" id="totalItems">0</div>
+            <div class="stat-foot">Jenis barang terdaftar</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-top"><span class="stat-name">Total Stok</span><span class="stat-icon icon-blue">▦</span></div>
+            <div class="stat-value" id="totalStock">0</div>
+            <div class="stat-foot">Akumulasi seluruh unit stok</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-top"><span class="stat-name">Stok Menipis</span><span class="stat-icon icon-red">⚠</span></div>
+            <div class="stat-value" id="lowStock">0</div>
+            <div class="stat-foot">Barang perlu diperiksa</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-top"><span class="stat-name">Nilai Persediaan</span><span class="stat-icon icon-green">Rp</span></div>
+            <div class="stat-value" id="totalValue">Rp0</div>
+            <div class="stat-foot">Estimasi berdasarkan harga satuan</div>
+          </div>
+        </div>
+
+        <div class="panel">
+          <div class="panel-head">
+            <div><h3>Daftar Inventaris Barang</h3><p>Data barang, lokasi penyimpanan, dan status ketersediaan.</p></div>
+            <div class="filters">
+              <input class="control search" id="searchDashboard" placeholder="⌕ Cari nama / kode barang...">
+              <select class="control" id="categoryDashboard">
+                <option value="">Semua kategori</option>
+              </select>
+              <button class="button button-outline" id="toInventory">Lihat Semua</button>
+            </div>
+          </div>
+          <div class="table-wrap">
+            <table>
+              <thead><tr><th>Nama Barang</th><th>Kategori</th><th>Lokasi</th><th>Stok</th><th>Harga Satuan</th><th>Status</th></tr></thead>
+              <tbody id="dashboardTable"></tbody>
+            </table>
+          </div>
+        </div>
+
+        <div class="bottom-grid">
+          <div class="panel">
+            <div class="panel-head"><div><h3>Transaksi Terbaru</h3><p>Aktivitas barang masuk dan keluar.</p></div></div>
+            <div id="recentTransactions"></div>
+          </div>
+          <div class="panel">
+            <div class="panel-head"><div><h3>Perhatian Stok</h3><p>Barang yang mendekati batas minimum.</p></div></div>
+            <div id="stockAlerts"></div>
+          </div>
+        </div>
+      </section>
+
+      <section class="page-view" id="inventory">
+        <div class="welcome">
+          <div><h1>Data Inventaris</h1><div class="subheading">Kelola data dan jumlah barang di gudang.</div></div>
+          <button class="button button-primary" id="addItemInventory">＋ Tambah Barang</button>
+        </div>
+        <div class="panel">
+          <div class="panel-head">
+            <div><h3>Semua Barang</h3><p>Data disimpan pada browser yang sedang digunakan.</p></div>
+            <div class="filters">
+              <input class="control search" id="searchInventory" placeholder="Cari barang...">
+              <select class="control" id="categoryInventory"><option value="">Semua kategori</option></select>
+            </div>
+          </div>
+          <div class="table-wrap">
+            <table>
+              <thead><tr><th>Nama Barang</th><th>Kode</th><th>Kategori</th><th>Lokasi</th><th>Stok</th><th>Min.</th><th>Harga Satuan</th><th>Status</th><th>Aksi</th></tr></thead>
+              <tbody id="inventoryTable"></tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <section class="page-view" id="transactions">
+        <div class="welcome">
+          <div><h1>Transaksi Stok</h1><div class="subheading">Catat pergerakan barang masuk dan barang keluar.</div></div>
+          <button class="button button-primary" id="addTransaction">＋ Catat Transaksi</button>
+        </div>
+        <div class="panel">
+          <div class="panel-head"><div><h3>Riwayat Transaksi</h3><p>Riwayat perubahan jumlah stok barang.</p></div></div>
+          <div class="table-wrap">
+            <table>
+              <thead><tr><th>Tanggal</th><th>Kode Barang</th><th>Nama Barang</th><th>Jenis</th><th>Jumlah</th><th>Catatan</th></tr></thead>
+              <tbody id="transactionsTable"></tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <section class="page-view" id="reports">
+        <div class="welcome">
+          <div><h1>Laporan Stok</h1><div class="subheading">Ringkasan jumlah dan estimasi nilai persediaan.</div></div>
+          <button class="button button-dark" id="exportReport">⇩ Unduh Laporan CSV</button>
+        </div>
+        <div class="stats">
+          <div class="stat-card"><div class="stat-name">Jenis Barang</div><div class="stat-value" id="reportItems">0</div></div>
+          <div class="stat-card"><div class="stat-name">Total Unit</div><div class="stat-value" id="reportStock">0</div></div>
+          <div class="stat-card"><div class="stat-name">Barang Stok Rendah</div><div class="stat-value" id="reportLow">0</div></div>
+          <div class="stat-card"><div class="stat-name">Nilai Persediaan</div><div class="stat-value" id="reportValue">Rp0</div></div>
+        </div>
+        <div class="panel">
+          <div class="panel-head"><div><h3>Ringkasan per Kategori</h3><p>Jumlah jenis barang, total unit, dan nilai persediaan.</p></div></div>
+          <div class="table-wrap">
+            <table><thead><tr><th>Kategori</th><th>Jenis Barang</th><th>Total Unit</th><th>Nilai Persediaan</th></tr></thead><tbody id="categoryReport"></tbody></table>
+          </div>
+        </div>
+      </section>
+
+      <footer>© <span id="year"></span> Mining Inventory Management System · Versi 1.0</footer>
+    </div>
+  </main>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<dialog id="itemDialog">
+  <div class="modal-head"><h3 id="itemDialogTitle">Tambah Barang Baru</h3></div>
+  <form id="itemForm" class="modal-body">
+    <input type="hidden" id="editId">
+    <div class="form-grid">
+      <div class="field full"><label for="itemName">Nama Barang *</label><input id="itemName" required maxlength="100" placeholder="Contoh: Helm Safety"></div>
+      <div class="field"><label for="itemCode">Kode Barang *</label><input id="itemCode" required maxlength="30" placeholder="Contoh: APD-001"></div>
+      <div class="field"><label for="itemCategory">Kategori *</label>
+        <select id="itemCategory" required>
+          <option value="APD">APD</option><option value="Peralatan">Peralatan</option>
+          <option value="Sparepart">Sparepart</option><option value="Operasional">Operasional</option>
+          <option value="Bahan Bakar">Bahan Bakar</option><option value="Lainnya">Lainnya</option>
+        </select>
+      </div>
+      <div class="field"><label for="itemLocation">Lokasi *</label><input id="itemLocation" required maxlength="80" placeholder="Contoh: Gudang A"></div>
+      <div class="field"><label for="itemUnit">Satuan *</label><select id="itemUnit"><option>pcs</option><option>unit</option><option>set</option><option>liter</option><option>kg</option><option>meter</option><option>box</option></select></div>
+      <div class="field"><label for="itemStock">Jumlah Stok *</label><input type="number" id="itemStock" required min="0" step="1" value="0"></div>
+      <div class="field"><label for="itemMinimum">Batas Minimum *</label><input type="number" id="itemMinimum" required min="0" step="1" value="5"></div>
+      <div class="field full"><label for="itemPrice">Harga Satuan (Rp) *</label><input type="number" id="itemPrice" required min="0" step="1" value="0"></div>
+    </div>
+    <div class="modal-actions">
+      <button type="button" class="button button-outline" data-close="itemDialog">Batal</button>
+      <button type="submit" class="button button-primary">Simpan Barang</button>
+    </div>
+  </form>
+</dialog>
+
+<dialog id="transactionDialog">
+  <div class="modal-head"><h3>Catat Transaksi Stok</h3></div>
+  <form id="transactionForm" class="modal-body">
+    <div class="form-grid">
+      <div class="field full"><label for="txItem">Pilih Barang *</label><select id="txItem" required></select></div>
+      <div class="field"><label for="txType">Jenis Transaksi *</label><select id="txType"><option value="Masuk">Barang Masuk (+)</option><option value="Keluar">Barang Keluar (-)</option></select></div>
+      <div class="field"><label for="txQty">Jumlah *</label><input type="number" id="txQty" min="1" step="1" required value="1"></div>
+      <div class="field full"><label for="txNote">Catatan</label><input id="txNote" maxlength="150" placeholder="Contoh: Pengadaan barang"></div>
+    </div>
+    <div class="modal-actions">
+      <button type="button" class="button button-outline" data-close="transactionDialog">Batal</button>
+      <button type="submit" class="button button-primary">Simpan Transaksi</button>
+    </div>
+  </form>
+</dialog>
+
+<script>
+(() => {
+  "use strict";
+
+  const $ = id => document.getElementById(id);
+  const money = value => new Intl.NumberFormat("id-ID", {
+    style: "currency", currency: "IDR", maximumFractionDigits: 0
+  }).format(value || 0);
+  const number = value => new Intl.NumberFormat("id-ID").format(value || 0);
+  const today = () => new Date().toISOString().slice(0, 10);
+  const safe = value => String(value ?? "").replace(/[&<>"']/g, char => ({
+    "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;"
+  })[char]);
+
+  const demoItems = [
+    {id:1, name:"Helm Safety", code:"APD-001", category:"APD", location:"Gudang A", unit:"pcs", stock:85, min:20, price:175000},
+    {id:2, name:"Safety Shoes", code:"APD-002", category:"APD", location:"Gudang A", unit:"pasang", stock:12, min:15, price:450000},
+    {id:3, name:"Sarung Tangan", code:"APD-003", category:"APD", location:"Gudang A", unit:"pasang", stock:150, min:30, price:35000},
+    {id:4, name:"Kunci Inggris", code:"TLS-001", category:"Peralatan", location:"Workshop", unit:"pcs", stock:24, min:5, price:125000},
+    {id:5, name:"Oli Mesin", code:"SPR-001", category:"Sparepart", location:"Gudang B", unit:"liter", stock:8, min:15, price:95000},
+    {id:6, name:"Filter Udara", code:"SPR-002", category:"Sparepart", location:"Gudang B", unit:"pcs", stock:32, min:10, price:230000},
+    {id:7, name:"Solar Industri", code:"OPS-001", category:"Bahan Bakar", location:"Tangki BBM", unit:"liter", stock:450, min:100, price:14500},
+    {id:8, name:"Kabel Listrik", code:"OPS-002", category:"Operasional", location:"Gudang C", unit:"meter", stock:5, min:20, price:18000}
+  ];
+
+  const demoTransactions = [
+    {id:1, date:today(), itemId:1, type:"Masuk", qty:20, note:"Pengadaan APD"},
+    {id:2, date:today(), itemId:5, type:"Keluar", qty:4, note:"Pemeliharaan alat"},
+    {id:3, date:today(), itemId:3, type:"Masuk", qty:50, note:"Restock gudang"}
+  ];
+
+  function load(key, fallback) {
+    try {
+      const raw = localStorage.getItem(key);
+      return raw ? JSON.parse(raw) : structuredClone(fallback);
+    } catch {
+      return structuredClone(fallback);
+    }
+  }
+
+  let items = load("miningInventoryItems", demoItems);
+  let transactions = load("miningInventoryTransactions", demoTransactions);
+  let nextId = Math.max(0, ...items.map(item => Number(item.id) || 0)) + 1;
+  let nextTxId = Math.max(0, ...transactions.map(tx => Number(tx.id) || 0)) + 1;
+
+  function persist() {
+    try {
+      localStorage.setItem("miningInventoryItems", JSON.stringify(items));
+      localStorage.setItem("miningInventoryTransactions", JSON.stringify(transactions));
+      return true;
+    } catch {
+      notify("Penyimpanan browser penuh atau tidak tersedia.");
+      return false;
+    }
+  }
+
+  function notify(message) {
+    const toast = $("toast");
+    toast.textContent = message;
+    toast.style.display = "block";
+    clearTimeout(notify.timer);
+    notify.timer = setTimeout(() => toast.style.display = "none", 3000);
+  }
+
+  function status(item) {
+    if (Number(item.stock) <= 0) return {label:"Habis", cls:"pill-red"};
+    if (Number(item.stock) <= Number(item.min)) return {label:"Stok Rendah", cls:"pill-yellow"};
+    return {label:"Tersedia", cls:"pill-green"};
+  }
+
+  function getItem(id) {
+    return items.find(item => String(item.id) === String(id));
+  }
+
+  function categoryOptions() {
+    const categories = [...new Set(items.map(item => item.category))].sort();
+    ["categoryDashboard", "categoryInventory"].forEach(id => {
+      const el = $(id);
+      const old = el.value;
+      el.innerHTML = '<option value="">Semua kategori</option>' +
+        categories.map(c => `<option value="${safe(c)}">${safe(c)}</option>`).join("");
+      el.value = categories.includes(old) ? old : "";
+    });
+  }
+
+  function itemRows(list, full = false) {
+    if (!list.length) return `<tr><td colspan="${full ? 9 : 6}" class="empty">Tidak ada data barang yang cocok.</td></tr>`;
+    return list.map(item => {
+      const st = status(item);
+      const common = `
+        <td><div class="item-name">${safe(item.name)}</div>${full ? "" : `<div class="item-code">${safe(item.code)}</div>`}</td>
+        ${full ? `<td>${safe(item.code)}</td>` : ""}
+        <td>${safe(item.category)}</td>
+        <td>${safe(item.location)}</td>
+        <td><strong>${number(item.stock)}</strong> ${safe(item.unit)}</td>
+        ${full ? `<td>${number(item.min)} ${safe(item.unit)}</td>` : ""}
+        <td>${money(item.price)}</td>
+        <td><span class="pill ${st.cls}">${st.label}</span></td>`;
+      return `<tr>${common}${full ? `<td><div class="row-actions">
+        <button class="small-btn" data-edit="${item.id}">Edit</button>
+        <button class="small-btn" data-tx="${item.id}">± Stok</button>
+        <button class="small-btn" data-delete="${item.id}" aria-label="Hapus ${safe(item.name)}">Hapus</button>
+      </div></td>` : ""}</tr>`;
+    }).join("");
+  }
+
+  function render() {
+    categoryOptions();
+    const low = items.filter(item => Number(item.stock) <= Number(item.min));
+    const totalStock = items.reduce((sum, item) => sum + Number(item.stock || 0), 0);
+    const value = items.reduce((sum, item) => sum + Number(item.stock || 0) * Number(item.price || 0), 0);
+
+    $("totalItems").textContent = number(items.length);
+    $("totalStock").textContent = number(totalStock);
+    $("lowStock").textContent = number(low.length);
+    $("totalValue").textContent = money(value);
+    $("reportItems").textContent = number(items.length);
+    $("reportStock").textContent = number(totalStock);
+    $("reportLow").textContent = number(low.length);
+    $("reportValue").textContent = money(value);
+
+    const q = $("searchDashboard").value.trim().toLowerCase();
+    const cat = $("categoryDashboard").value;
+    const filtered = items.filter(item =>
+      (!q || `${item.name} ${item.code} ${item.location}`.toLowerCase().includes(q)) &&
+      (!cat || item.category === cat)
+    );
+    $("dashboardTable").innerHTML = itemRows(filtered.slice(0, 7));
+    $("inventoryTable").innerHTML = itemRows(items.filter(item => {
+      const query = $("searchInventory").value.trim().toLowerCase();
+      const category = $("categoryInventory").value;
+      return (!query || `${item.name} ${item.code} ${item.location}`.toLowerCase().includes(query)) &&
+             (!category || item.category === category);
+    }), true);
+
+    const latest = [...transactions].sort((a,b) =>
+      String(b.date).localeCompare(String(a.date)) || b.id - a.id
+    ).slice(0, 5);
+
+    $("recentTransactions").innerHTML = latest.length ? latest.map(tx => {
+      const item = getItem(tx.itemId);
+      const incoming = tx.type === "Masuk";
+      return `<div class="movement-row">
+        <div class="movement-icon ${incoming ? "icon-green" : "icon-orange"}">${incoming ? "↓" : "↑"}</div>
+        <div class="movement-info"><strong>${safe(item ? item.name : "Barang dihapus")}</strong><small>${safe(tx.date)} · ${safe(tx.note || tx.type)}</small></div>
+        <div class="movement-qty ${incoming ? "good" : "danger"}">${incoming ? "+" : "−"}${number(tx.qty)}</div>
+      </div>`;
+    }).join("") : '<div class="empty">Belum ada transaksi.</div>';
+
+    $("stockAlerts").innerHTML = low.length ? low.slice(0, 5).map(item => {
+      const pct = item.min > 0 ? Math.min(100, item.stock / item.min * 100) : 100;
+      const color = item.stock <= 0 ? "#dc4c4c" : "#f59e0b";
+      return `<div class="stock-line">
+        <div class="stock-info"><span><strong>${safe(item.name)}</strong><br><small>${safe(item.code)}</small></span><span class="warning">${number(item.stock)} / ${number(item.min)} ${safe(item.unit)}</span></div>
+        <div class="progress"><div class="progress-bar" style="width:${pct}%;background:${color}"></div></div>
+      </div>`;
+    }).join("") : '<div class="empty">Semua barang berada di atas batas minimum.</div>';
+
+    const groups = {};
+    items.forEach(item => {
+      if (!groups[item.category]) groups[item.category] = {count:0, stock:0, value:0};
+      groups[item.category].count++;
+      groups[item.category].stock += Number(item.stock);
+      groups[item.category].value += Number(item.stock) * Number(item.price);
+    });
+    const entries = Object.entries(groups);
+    $("categoryReport").innerHTML = entries.length ? entries.map(([cat, v]) =>
+      `<tr><td><strong>${safe(cat)}</strong></td><td>${number(v.count)}</td><td>${number(v.stock)}</td><td>${money(v.value)}</td></tr>`
+    ).join("") : '<tr><td colspan="4" class="empty">Belum ada data.</td></tr>';
+
+    $("transactionsTable").innerHTML = [...transactions]
+      .sort((a,b) => String(b.date).localeCompare(String(a.date)) || b.id - a.id)
+      .map(tx => {
+        const item = getItem(tx.itemId);
+        return `<tr><td>${safe(tx.date)}</td><td>${safe(item ? item.code : "-")}</td>
+        <td>${safe(item ? item.name : "Barang dihapus")}</td>
+        <td><span class="pill ${tx.type === "Masuk" ? "pill-green" : "pill-blue"}">${safe(tx.type)}</span></td>
+        <td><strong>${number(tx.qty)}</strong></td><td>${safe(tx.note || "-")}</td></tr>`;
+      }).join("") || '<tr><td colspan="6" class="empty">Belum ada transaksi.</td></tr>';
+  }
+
+  function showPage(page) {
+    document.querySelectorAll(".page-view").forEach(el => el.classList.toggle("active", el.id === page));
+    document.querySelectorAll(".nav-item[data-page]").forEach(el => el.classList.toggle("active", el.dataset.page === page));
+    const names = {dashboard:"Dashboard Overview", inventory:"Data Inventaris", transactions:"Transaksi Stok", reports:"Laporan Stok"};
+    $("headerTitle").textContent = names[page] || "Mining Inventory";
+    $("breadcrumb").textContent = names[page] || page;
+    if (page === "inventory") $("searchInventory").focus();
+    window.scrollTo({top:0, behavior:"smooth"});
+  }
+
+  document.querySelectorAll("[data-page]").forEach(button =>
+    button.addEventListener("click", () => showPage(button.dataset.page))
+  );
+  $("toInventory").addEventListener("click", () => showPage("inventory"));
+  $("searchDashboard").addEventListener("input", render);
+  $("categoryDashboard").addEventListener("change", render);
+  $("searchInventory").addEventListener("input", render);
+  $("categoryInventory").addEventListener("change", render);
+
+  function openItem(item = null) {
+    $("itemForm").reset();
+    $("editId").value = item ? item.id : "";
+    $("itemDialogTitle").textContent = item ? "Edit Data Barang" : "Tambah Barang Baru";
+    if (item) {
+      $("itemName").value = item.name;
+      $("itemCode").value = item.code;
+      $("itemCategory").value = item.category;
+      $("itemLocation").value = item.location;
+      $("itemUnit").value = item.unit;
+      $("itemStock").value = item.stock;
+      $("itemMinimum").value = item.min;
+      $("itemPrice").value = item.price;
+    }
+    $("itemDialog").showModal();
+  }
+
+  $("addItemTop").addEventListener("click", () => openItem());
+  $("addItemInventory").addEventListener("click", () => openItem());
+
+  $("itemForm").addEventListener("submit", event => {
+    event.preventDefault();
+    const editId = $("editId").value;
+    const code = $("itemCode").value.trim();
+    if (items.some(item => item.code.toLowerCase() === code.toLowerCase() && String(item.id) !== editId)) {
+      notify("Kode barang sudah digunakan. Gunakan kode lain.");
+      return;
+    }
+
+    const item = {
+      id: editId ? Number(editId) : nextId++,
+      name: $("itemName").value.trim(),
+      code,
+      category: $("itemCategory").value,
+      location: $("itemLocation").value.trim(),
+      unit: $("itemUnit").value,
+      stock: Number($("itemStock").value),
+      min: Number($("itemMinimum").value),
+      price: Number($("itemPrice").value)
+    };
+
+    if (editId) {
+      const index = items.findIndex(row => String(row.id) === editId);
+      if (index !== -1) items[index] = item;
+    } else {
+      items.push(item);
+      if (item.stock > 0) {
+        transactions.push({id:nextTxId++, date:today(), itemId:item.id, type:"Masuk", qty:item.stock, note:"Stok awal barang"});
+      }
+    }
+    persist();
+    $("itemDialog").close();
+    render();
+    notify(editId ? "Data barang berhasil diperbarui." : "Barang berhasil ditambahkan.");
+  });
+
+  function openTransaction(itemId = null) {
+    if (!items.length) {
+      notify("Tambahkan barang terlebih dahulu.");
+      return;
+    }
+    $("transactionForm").reset();
+    $("txItem").innerHTML = items.map(item =>
+      `<option value="${item.id}">${safe(item.code)} — ${safe(item.name)} (stok: ${number(item.stock)})</option>`
+    ).join("");
+    if (itemId != null) $("txItem").value = String(itemId);
+    $("txQty").value = 1;
+    $("transactionDialog").showModal();
+  }
+
+  $("addTransaction").addEventListener("click", () => openTransaction());
+
+  $("transactionForm").addEventListener("submit", event => {
+    event.preventDefault();
+    const item = getItem($("txItem").value);
+    const type = $("txType").value;
+    const qty = Number($("txQty").value);
+    if (!item || !Number.isInteger(qty) || qty <= 0) {
+      notify("Periksa barang dan jumlah transaksi.");
+      return;
+    }
+    if (type === "Keluar" && qty > item.stock) {
+      notify("Stok tidak mencukupi untuk transaksi keluar.");
+      return;
+    }
+
+    item.stock += type === "Masuk" ? qty : -qty;
+    transactions.push({
+      id:nextTxId++, date:today(), itemId:item.id, type, qty,
+      note:$("txNote").value.trim() || (type === "Masuk" ? "Barang masuk" : "Barang keluar")
+    });
+    persist();
+    $("transactionDialog").close();
+    render();
+    notify("Transaksi berhasil disimpan.");
+  });
+
+  document.addEventListener("click", event => {
+    const edit = event.target.closest("[data-edit]");
+    const tx = event.target.closest("[data-tx]");
+    const del = event.target.closest("[data-delete]");
+    const close = event.target.closest("[data-close]");
+
+    if (edit) {
+      const item = getItem(edit.dataset.edit);
+      if (item) openItem(item);
+    }
+    if (tx) openTransaction(tx.dataset.tx);
+    if (del) {
+      const item = getItem(del.dataset.delete);
+      if (!item) return;
+      if (confirm(`Hapus barang "${item.name}"? Riwayat transaksi tetap disimpan.`)) {
+        items = items.filter(row => row.id !== item.id);
+        persist();
+        render();
+        notify("Barang berhasil dihapus.");
+      }
+    }
+    if (close) $(close.dataset.close).close();
+  });
+
+  function csvCell(value) {
+    return '"' + String(value ?? "").replace(/"/g, '""') + '"';
+  }
+
+  function downloadCSV(filename, rows) {
+    const csv = "\uFEFF" + rows.map(row => row.map(csvCell).join(",")).join("\r\n");
+    const blob = new Blob([csv], {type:"text/csv;charset=utf-8;"});
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = filename;
+    document.body.appendChild(link);
+    link.click();
+    link.remove();
+    URL.revokeObjectURL(url);
+    notify("File CSV berhasil dibuat.");
+  }
+
+  function exportInventory() {
+    downloadCSV("laporan-inventaris-tambang.csv", [
+      ["Kode Barang","Nama Barang","Kategori","Lokasi","Stok","Satuan","Batas Minimum","Harga Satuan","Nilai Persediaan","Status"],
+      ...items.map(item => [
+        item.code, item.name, item.category, item.location, item.stock,
+        item.unit, item.min, item.price, item.stock * item.price, status(item).label
+      ])
+    ]);
+  }
+
+  $("backupBtn").addEventListener("click", exportInventory);
+  $("exportReport").addEventListener("click", exportInventory);
+
+  $("resetBtn").addEventListener("click", () => {
+    if (!confirm("Kembalikan data ke contoh awal? Data yang tersimpan di browser ini akan diganti.")) return;
+    items = structuredClone(demoItems);
+    transactions = structuredClone(demoTransactions);
+    nextId = Math.max(...items.map(item => item.id)) + 1;
+    nextTxId = Math.max(...transactions.map(tx => tx.id)) + 1;
+    persist();
+    render();
+    notify("Data demo berhasil dipulihkan.");
+  });
+
+  $("year").textContent = new Date().getFullYear();
+  render();
+})();
+</script>
+</body>
+</html>
